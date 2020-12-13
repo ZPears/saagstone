@@ -1,22 +1,23 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans&display=swap&subset=cyrillic");
+
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
+html, body, #root {
+	width: 100vw;
+	height: 100vh;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+html {
+	font-family: "Open Sans", sans-serif;
+	line-height: 1;
+	font-size: 14px;
+	overflow-x: hidden;
+	color: #1e2021;
 }
 
-.App-link {
-  color: #09d3ac;
+a {
+	color: #1e2021;
+	text-decoration: none;
 }
