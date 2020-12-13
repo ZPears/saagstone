@@ -1,9 +1,5 @@
-# TEMPLATE FOR REACT/ELECTRON/RETROPIE APPS
+# SAAGSTONE
 
-### How to Build
+### What is this?
 
-To make an AppImage that can run on retropie, run:
-
-`yarn run electron:retropie`
-
-Your AppImage will then be in dist/ at the top level.
+A card game you're gonna like playing with your friends.
