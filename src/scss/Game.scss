@@ -8,8 +8,6 @@
 }
 
 .game .cards-container {
-	width: calc(100vw - ($spacer * 12));
-	height: calc(100vh - ($spacer * 12));
 	margin: $spacer * 6;
 	display: grid;
 	grid-template-columns: repeat(6, auto);
@@ -31,8 +29,6 @@
 	}
 
 	@include media-breakpoint-down(md) {
-		width: calc(100vw - ($spacer * 2));
-		height: calc(100vh - ($spacer * 2));
 		margin: $spacer;
 		grid-gap: $spacer / 2;
 	}
