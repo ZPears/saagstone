@@ -62,6 +62,7 @@ $card-border-radius: 15px;
 
 	.back::after {
 		opacity: .5;
+	  background: linear-gradient(#AA0000, #AA1111);
 	}
 }
 .card-container:hover .card.flipped {
