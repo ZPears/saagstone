@@ -21,7 +21,7 @@ $card-border-radius: 15px;
 	transition: transform .8s, box-shadow $animation-duration, border-color $animation-duration;
 	transform-style: preserve-3d;
 	box-shadow: 0 0 3px rgba(black, .15);
-	border: 2px solid #bababa;
+	border: 3px solid #bababa;
 
 	.side {
 		-webkit-backface-visibility: hidden;
@@ -56,20 +56,11 @@ $card-border-radius: 15px;
 		}
 	}
 }
-.card-container:hover .card {
-	border: 2px solid $accent-color;
-	box-shadow: 0 0 10px rgba($accent-color, .6);
-
-	.back::after {
-		opacity: .5;
-	  background: linear-gradient(#AA0000, #AA1111);
-	}
-}
-.card-container:hover .card.flipped {
-	border: 2px solid darken($accent-color, 5%);
-}
-
 .card.flipped {
-	border: 2px solid darken($accent-color, 10%);
+	border: 3px solid darken($accent-color, 10%);
   transform: rotateY(180deg);
+}
+
+.card.selected {
+	border: 3px solid red;
 }

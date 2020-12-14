@@ -7,6 +7,7 @@ export interface CardInfo {
   id: string,
   imageUrl: string,
   isFlipped: boolean,
+  isSelected: boolean,
   canFlip: boolean
 }
 
@@ -19,20 +20,25 @@ function generateCards(numCards: number): Array<CardInfo> {
     throw `Count must be even, but numCards was ${numCards}`
   }
 
-  const cards = shuffleArray(cardImages)
+  const cards: Array<CardInfo> = shuffleArray(cardImages)
     .slice(0, numCards / 2)
     .map(cardImage => ({
       id: uuid.v4().toString(),
       imageUrl: `${process.env.PUBLIC_URL}/static/images/cards/${cardImage}`,
       isFlipped: false,
-      canFlip: true
+      canFlip: true,
+      isSelected: false
     }))
     .flatMap(cardInfo =>
       [cardInfo,
         { ...JSON.parse(JSON.stringify(cardInfo)), id: uuid.v4().toString() }]
     )
 
-  return shuffleArray(cards);
+  const shuffled = shuffleArray(cards);
+
+  shuffled[0].isSelected = true;
+
+  return shuffled;
 }
 
 export default function MainGame() {
@@ -47,15 +53,15 @@ export default function MainGame() {
   //   }
   // }, []);
 
+  // const handleKeyDown = (event: KeyboardEvent) => {
+  //   setKeyCode(event.keyCode);
+  // }
+
   const [cards, setCards] =
     useState<Array<CardInfo>>(generateCards(totalCards));
   const [canFlip, setCanFlip] = useState<boolean>(false);
   const [firstCard, setFirstCard] = useState<CardInfo | null>(null);
   const [secondCard, setSecondCard] = useState<CardInfo | null>(null);
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    setKeyCode(event.keyCode);
-  }
 
   function setCardIsFlipped(cardId: string, isFlipped: boolean) {
     setCards(prev => prev.map(c => {
@@ -128,7 +134,7 @@ export default function MainGame() {
       <div className="cards-container">
         {cards.map(card => {
           return <Card imageUrl={card.imageUrl} isFlipped={card.isFlipped}
-            canFlip={card.canFlip} onClick={() => onCardClick(card)} />
+            canFlip={card.canFlip} onClick={() => onCardClick(card)} isSelected={card.isSelected} />
         })}
       </div>
     </div>
