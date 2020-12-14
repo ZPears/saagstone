@@ -27,7 +27,10 @@ function generateCards(numCards: number): Array<CardInfo> {
       isFlipped: false,
       canFlip: true
     }))
-  // .flatMap()
+    .flatMap(cardInfo =>
+      [cardInfo,
+        { ...JSON.parse(JSON.stringify(cardInfo)), id: uuid.v4().toString() }]
+    )
 
   return shuffleArray(cards);
 }
