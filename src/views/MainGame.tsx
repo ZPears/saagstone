@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import uuid from "uuid";
 import cardImages from './../utils/CardImages';
 import Card from "./../components/Card";
+import keyCodeForPicadeInput, { PicadeInput } from '../picade/PicadeInputs';
 
 export interface CardInfo {
   id: string,
@@ -42,42 +43,84 @@ function generateCards(numCards: number): Array<CardInfo> {
 }
 
 export default function MainGame() {
-  const totalCards = 18;
+  const columns = 6;
+  const rows = 3;
+  const totalCards = columns * rows;
 
-  // REMOVE
-  const [keyCode, setKeyCode] = useState<number>(0);
-  // useEffect(() => {
-  //   window.addEventListener('keydown', handleKeyDown);
-  //   return () => {
-  //     window.removeEventListener('keydown', handleKeyDown);
-  //   }
-  // }, []);
-
-  // const handleKeyDown = (event: KeyboardEvent) => {
-  //   setKeyCode(event.keyCode);
-  // }
-
+  const [cardIdx, setCardIdx] = useState<number>(0);
   const [cards, setCards] =
     useState<Array<CardInfo>>(generateCards(totalCards));
   const [canFlip, setCanFlip] = useState<boolean>(false);
   const [firstCard, setFirstCard] = useState<CardInfo | null>(null);
   const [secondCard, setSecondCard] = useState<CardInfo | null>(null);
 
-  function setCardIsFlipped(cardId: string, isFlipped: boolean) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.keyCode) {
+        case keyCodeForPicadeInput(PicadeInput.JOYSTICK_UP): {
+          if (cardIdx >= columns) {
+            const newIdx: number = cardIdx - columns;
+            handleSelectionChange(cardIdx, newIdx);
+          }
+          break;
+        }
+        case keyCodeForPicadeInput(PicadeInput.JOYSTICK_LEFT): {
+          if (cardIdx % columns > 0) {
+            const newIdx: number = cardIdx - 1;
+            handleSelectionChange(cardIdx, newIdx);
+          }
+          break;
+        }
+        case keyCodeForPicadeInput(PicadeInput.JOYSTICK_RIGHT): {
+          if (cardIdx % columns < columns - 1) {
+            const newIdx: number = cardIdx + 1;
+            handleSelectionChange(cardIdx, newIdx);
+          }
+          break;
+        }
+        case keyCodeForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
+          if (cardIdx < totalCards - columns) {
+            const newIdx: number = cardIdx + columns;
+            handleSelectionChange(cardIdx, newIdx);
+          }
+          break;
+        }
+        case keyCodeForPicadeInput(PicadeInput.BUTTON_A): {
+          onCardClick(cards[cardIdx]);
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [cardIdx]);
+
+
+  function handleSelectionChange(oldIdx: number, newIdx: number): void {
+    setCards(prev => prev.map((c, idx) => {
+      if (idx === oldIdx) { return { ...c, isSelected: false } }
+      else if (idx === newIdx) { return { ...c, isSelected: true } }
+      else { return c; }
+    }))
+    setCardIdx(newIdx);
+  }
+
+  function setCardIsFlipped(cardId: string, isFlipped: boolean): void {
     setCards(prev => prev.map(c => {
       if (c.id !== cardId) { return c; }
       else { return { ...c, isFlipped } };
     }))
   }
 
-  function setCardCanFlip(cardId: string, canFlip: boolean) {
+  function setCardCanFlip(cardId: string, canFlip: boolean): void {
     setCards(prev => prev.map(c => {
       if (c.id !== cardId) { return c; }
       else { return { ...c, canFlip } };
     }))
   }
 
-  function resetFirstAndSecondCards() {
+  function resetFirstAndSecondCards(): void {
     setFirstCard(null);
     setSecondCard(null);
   }
@@ -134,7 +177,8 @@ export default function MainGame() {
       <div className="cards-container">
         {cards.map(card => {
           return <Card imageUrl={card.imageUrl} isFlipped={card.isFlipped}
-            canFlip={card.canFlip} onClick={() => onCardClick(card)} isSelected={card.isSelected} />
+            canFlip={card.canFlip} onClick={() => onCardClick(card)}
+            isSelected={card.isSelected} />
         })}
       </div>
     </div>

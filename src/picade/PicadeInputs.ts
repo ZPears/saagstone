@@ -1,4 +1,4 @@
-enum PicadeInput {
+export enum PicadeInput {
   JOYSTICK_UP,
   JOYSTICK_LEFT,
   JOYSTICK_RIGHT,
@@ -23,8 +23,8 @@ interface Mapping {
 const mappings: Array<Mapping> = [
   { input: PicadeInput.JOYSTICK_UP, keyCode: 38 },
   { input: PicadeInput.JOYSTICK_LEFT, keyCode: 37 },
-  { input: PicadeInput.JOYSTICK_RIGHT, keyCode: 40 },
-  { input: PicadeInput.JOYSTICK_DOWN, keyCode: 39 },
+  { input: PicadeInput.JOYSTICK_DOWN, keyCode: 40 },
+  { input: PicadeInput.JOYSTICK_RIGHT, keyCode: 39 },
   { input: PicadeInput.BUTTON_A, keyCode: 90 },
   { input: PicadeInput.BUTTON_B, keyCode: 16 },
   { input: PicadeInput.BUTTON_X, keyCode: 18 },
