@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import uuid from "uuid";
-import cardImages from './../utils/CardImages';
+import cardImages from '../static/CardImages';
 import Card from "./../components/Card";
 import keyCodeForPicadeInput, { PicadeInput } from '../picade/PicadeInputs';
 

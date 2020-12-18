@@ -1,22 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import Keyboard from 'react-simple-keyboard';
-import { Button, Card } from 'react-bootstrap';
-import keyCodeForPicadeInput, { PicadeInput } from '../../picade/PicadeInputs';
+import { Button, Card, Form } from 'react-bootstrap';
+import Keyboard from './../../utils/Keyboard';
+import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
 
 export default function JoinGameModal() {
 
-  const [newGameSelected, setNewGameSelected] = useState<boolean>(true);
+  const [newGameHighlighted, setNewGameHighlighted] = useState<boolean>(true);
+  const [newGameSelected, setNewGameSelected] = useState<boolean>(false);
+  const [joinGameSelected, setJoinGameSelected] = useState<boolean>(false);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       console.log(`keycode ${event.keyCode}, ${event.key} prseed`);
-      switch (event.keyCode) {
-        case keyCodeForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
-          if (newGameSelected) { setNewGameSelected(false); }
+      switch (event.key) {
+        case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
+          if (newGameHighlighted) { setNewGameHighlighted(false); }
           break;
         }
-        case keyCodeForPicadeInput(PicadeInput.JOYSTICK_UP): {
-          if (!newGameSelected) { setNewGameSelected(true); }
+        case keyNameForPicadeInput(PicadeInput.JOYSTICK_UP): {
+          if (!newGameHighlighted) { setNewGameHighlighted(true); }
+          break;
+        }
+        case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
+          if (newGameHighlighted) { setNewGameSelected(true); }
+          else { setJoinGameSelected(true); }
+          break;
+        }
+        case keyNameForPicadeInput(PicadeInput.BUTTON_B): {
+          if (newGameSelected || joinGameSelected) {
+            setNewGameSelected(false);
+            setJoinGameSelected(false);
+          }
           break;
         }
       }
@@ -25,18 +39,42 @@ export default function JoinGameModal() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [newGameSelected]);
+  }, [newGameHighlighted, newGameSelected, joinGameSelected]);
 
-  return (
-    <Card className="page-centered">
+  function JoinMenu() {
+    return (
       <Card.Body className="card-grid">
-        <Button variant={newGameSelected ? "success" : "secondary"} className="grid-elem1 grid-button">
+        <Button variant={newGameHighlighted ? "success" : "secondary"} className="grid-elem1 grid-button">
           Start New Game
         </Button>
-        <Button variant={!newGameSelected ? "success" : "secondary"} className="grid-elem2 grid-button">
+        <Button variant={!newGameHighlighted ? "success" : "secondary"} className="grid-elem2 grid-button">
           Join Existing Game
         </Button>
       </Card.Body>
+    )
+  }
+
+  function GameSelector() {
+    return (
+      <Card.Body className="card-grid">
+        <Form>
+          <Form.Group>
+            <Form.Label>Your Alias</Form.Label>
+            <Form.Control required type="textarea"></Form.Control>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Your Alias</Form.Label>
+            <Form.Control required type="textarea"></Form.Control>
+          </Form.Group>
+        </Form>
+        <Keyboard />
+      </Card.Body>
+    )
+  }
+
+  return (
+    <Card className="page-centered">
+      {!(newGameSelected || joinGameSelected) ? JoinMenu() : GameSelector()}
     </Card>
   )
 }
