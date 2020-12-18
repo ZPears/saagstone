@@ -11,7 +11,12 @@ export default function App() {
   const [playerName, setPlayerName] = useState<string>("");
 
   return (
-    <div className="App">
+    <div className="App"
+      style={
+        {
+          backgroundImage:
+            `${process.env.PUBLIC_URL}/static/images/background_image.png`
+        }}>
       <GameContext.Provider value={{
         gameId: gameId,
         setGameId: setGameId,
