@@ -1,0 +1,31 @@
+.grid-button {
+  height: 5em;
+  font-weight: bold !important;
+  font-size: 1.5em !important;
+}
+
+.button-selected {
+
+}
+
+.card-grid {
+  display: grid;
+  grid-template-areas:
+    'space elem1 elem1 elem1 elem1 space' 
+    'space elem2 elem2 elem2 elem2 space' 
+    'space elem3 elem3 elem3 elem3 space';
+  grid-row-gap: 1em;
+}
+
+.grid-elem1 { grid-area: 'elem1'; }
+.grid-elem2 { grid-area: 'elem2'; }
+.grid-elem3 { grid-area: 'elem3'; }
+
+.page-centered {
+  width: 90%
+}
+
+.full-line-button {
+  width: 90%;
+  font-weight: bold
+}

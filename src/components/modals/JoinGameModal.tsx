@@ -9,6 +9,7 @@ export default function JoinGameModal() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log(`keycode ${event.keyCode}, ${event.key} prseed`);
       switch (event.keyCode) {
         case keyCodeForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
           if (newGameSelected) { setNewGameSelected(false); }
@@ -19,25 +20,22 @@ export default function JoinGameModal() {
           break;
         }
       }
-      window.addEventListener("keydown", handleKeyDown);
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
     }
   }, [newGameSelected]);
 
   return (
-    <Card>
-      <Card.Body>
-        <Button variant="success" className="menu-button">
+    <Card className="page-centered">
+      <Card.Body className="card-grid">
+        <Button variant={newGameSelected ? "success" : "secondary"} className="grid-elem1 grid-button">
           Start New Game
-            </Button>
-        <Button variant="success">
+        </Button>
+        <Button variant={!newGameSelected ? "success" : "secondary"} className="grid-elem2 grid-button">
           Join Existing Game
         </Button>
-        <Keyboard>
-
-        </Keyboard>
       </Card.Body>
     </Card>
   )
