@@ -7,6 +7,7 @@
 
 @import "./Card";
 @import "./Game";
+@import "./Keyboard";
 @import "./Modal";
 
 @import url("https://fonts.googleapis.com/css?family=Open+Sans&display=swap&subset=cyrillic");
@@ -39,4 +40,8 @@ html {
 a {
 	color: #1e2021;
 	text-decoration: none;
+}
+
+.text-centered {
+	text-align: center;
 }

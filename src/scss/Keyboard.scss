@@ -1,0 +1,13 @@
+.keyboard-key {
+  border: 2px solid;
+  border-radius: 3px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  text-align: center;
+  font-weight: bold;
+  height: 30px;
+}
+
+.selected-key {
+  background-color: lightgreen;
+}

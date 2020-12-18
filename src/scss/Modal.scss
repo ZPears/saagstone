@@ -11,6 +11,7 @@
     'space elem2 elem2 elem2 elem2 space' 
     'space elem3 elem3 elem3 elem3 space';
   grid-row-gap: 1em;
+  align-items: center;
 }
 
 .grid-elem1 { grid-area: 'elem1'; }

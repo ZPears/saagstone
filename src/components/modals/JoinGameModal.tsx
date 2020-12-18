@@ -9,9 +9,12 @@ export default function JoinGameModal() {
   const [newGameSelected, setNewGameSelected] = useState<boolean>(false);
   const [joinGameSelected, setJoinGameSelected] = useState<boolean>(false);
 
+  const [alias, setAlias] = useState<string>("");
+  const [gameCode, setGameCode] = useState<string>("");
+  const [writingAlias, setWritingAlias] = useState<boolean>(true);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      console.log(`keycode ${event.keyCode}, ${event.key} prseed`);
       switch (event.key) {
         case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
           if (newGameHighlighted) { setNewGameHighlighted(false); }
@@ -22,7 +25,9 @@ export default function JoinGameModal() {
           break;
         }
         case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
-          if (newGameHighlighted) { setNewGameSelected(true); }
+          // Ignore input if we're joining or creating a game.
+          if (newGameSelected || joinGameSelected) { }
+          else if (newGameHighlighted) { setNewGameSelected(true); }
           else { setJoinGameSelected(true); }
           break;
         }
@@ -41,13 +46,39 @@ export default function JoinGameModal() {
     }
   }, [newGameHighlighted, newGameSelected, joinGameSelected]);
 
+  function keyboardCallback(char: string, button: PicadeInput): void {
+    switch (button) {
+      case PicadeInput.BUTTON_A: {
+        writingAlias ?
+          setAlias(`${alias}${char}`) :
+          setGameCode(`${gameCode}${char}`);
+        break;
+      }
+      case PicadeInput.BUTTON_X: {
+        writingAlias ?
+          setAlias(`${alias.substring(0, alias.length)}`) :
+          setGameCode(`${gameCode.substring(0, gameCode.length)}`);
+        break;
+      }
+      case PicadeInput.START: {
+        if (writingAlias) { setWritingAlias(false) }
+        else {
+          // Make / fetch a game!
+        }
+        break;
+      }
+    }
+  }
+
   function JoinMenu() {
     return (
       <Card.Body className="card-grid">
-        <Button variant={newGameHighlighted ? "success" : "secondary"} className="grid-elem1 grid-button">
+        <Button variant={newGameHighlighted ? "success" : "secondary"}
+          className="grid-elem1 grid-button">
           Start New Game
         </Button>
-        <Button variant={!newGameHighlighted ? "success" : "secondary"} className="grid-elem2 grid-button">
+        <Button variant={!newGameHighlighted ? "success" : "secondary"}
+          className="grid-elem2 grid-button">
           Join Existing Game
         </Button>
       </Card.Body>
@@ -60,14 +91,17 @@ export default function JoinGameModal() {
         <Form>
           <Form.Group>
             <Form.Label>Your Alias</Form.Label>
-            <Form.Control required type="textarea"></Form.Control>
+            <Form.Control required type="textarea" defaultValue={alias} />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Your Alias</Form.Label>
-            <Form.Control required type="textarea"></Form.Control>
+            <Form.Label>Game Code</Form.Label>
+            <Form.Control required type="textarea" defaultValue={gameCode} />
           </Form.Group>
         </Form>
-        <Keyboard />
+        <Keyboard callback={keyboardCallback} />
+        <h3 className="text-centered">
+          Press Picade START (or "o" key) to submit!
+        </h3>
       </Card.Body>
     )
   }
