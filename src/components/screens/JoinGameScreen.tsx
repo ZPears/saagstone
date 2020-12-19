@@ -3,6 +3,12 @@ import { Button, Card, Form } from 'react-bootstrap';
 import Keyboard from '../../utils/Keyboard';
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
 
+enum InputState {
+  ALIAS,
+  GAMECODE,
+  WAITING
+}
+
 export default function JoinGameScreen() {
 
   const [newGameHighlighted, setNewGameHighlighted] = useState<boolean>(true);
@@ -11,7 +17,7 @@ export default function JoinGameScreen() {
 
   const [alias, setAlias] = useState<string>("");
   const [gameCode, setGameCode] = useState<string>("");
-  const [writingAlias, setWritingAlias] = useState<boolean>(true);
+  const [inputState, setInputState] = useState<InputState>(InputState.ALIAS);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -49,25 +55,42 @@ export default function JoinGameScreen() {
   function keyboardCallback(char: string, button: PicadeInput): void {
     switch (button) {
       case PicadeInput.BUTTON_A: {
-        writingAlias ?
-          setAlias(`${alias}${char}`) :
-          setGameCode(`${gameCode}${char}`);
-        break;
-      }
-      case PicadeInput.BUTTON_X: {
-        writingAlias ?
-          setAlias(`${alias.substring(0, alias.length)}`) :
-          setGameCode(`${gameCode.substring(0, gameCode.length)}`);
-        break;
-      }
-      case PicadeInput.START: {
-        if (writingAlias) { setWritingAlias(false) }
-        else {
-          // Make / fetch a game!
+        switch (inputState) {
+          case InputState.ALIAS: { setAlias(`${alias}${char}`); break; }
+          case InputState.GAMECODE: { setGameCode(`${gameCode}${char}`); break; }
         }
         break;
       }
+      case PicadeInput.BUTTON_X: {
+        switch (inputState) {
+          case InputState.ALIAS: {
+            setAlias(`${alias.substring(0, alias.length)}`); break;
+          }
+          case InputState.GAMECODE: {
+            setGameCode(`${gameCode.substring(0, gameCode.length)}`); break;
+          }
+        }
+        break;
+      }
+      case PicadeInput.START: {
+        switch (inputState) {
+          case InputState.ALIAS: { setInputState(InputState.GAMECODE); break; }
+          case InputState.GAMECODE: {
+            if (newGameSelected) {
+              // Create a new game.
+            }
+            // Join game is selected.
+            else {
+              // Lookup a game.
+            }
+          }
+        }
+      }
     }
+  }
+
+  function formInputStyleFor(state: InputState): string {
+    return `form-input${inputState === state ? " selected-input" : ""}`;
   }
 
   function JoinMenu() {
@@ -92,12 +115,14 @@ export default function JoinGameScreen() {
           <Form.Group>
             <Form.Label className={"form-title"}>Your Alias</Form.Label>
             <Form.Control required type="textarea"
-              defaultValue={alias} className={`form-input${writingAlias ? " selected-input" : ""}`} />
+              defaultValue={alias}
+              className={formInputStyleFor(InputState.ALIAS)} />
           </Form.Group>
           <Form.Group>
             <Form.Label className={"form-title"}>Game Code</Form.Label>
             <Form.Control required type="textarea"
-              defaultValue={gameCode} className={`form-input${writingAlias ? "" : " selected-input"}`} />
+              defaultValue={gameCode}
+              className={formInputStyleFor(InputState.GAMECODE)} />
           </Form.Group>
         </Form>
         <Keyboard callback={keyboardCallback} />
