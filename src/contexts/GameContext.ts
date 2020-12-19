@@ -9,8 +9,8 @@ export enum GameScreen {
 }
 
 export interface GameState {
-  gameId: string,
-  setGameId: (gameId: string) => void
+  gameId?: string,
+  setGameId: (id: string) => void,
   playerName: string,
   setPlayerName: (playerName: string) => void,
   currentScreen: GameScreen,
@@ -18,8 +18,7 @@ export interface GameState {
 }
 
 const defaultGameState = {
-  gameId: "",
-  setGameId: (gameId: string) => { },
+  setGameId: (id: string) => { },
   playerName: "",
   setPlayerName: (playerName: string) => { },
   currentScreen: GameScreen.JOINGAME,

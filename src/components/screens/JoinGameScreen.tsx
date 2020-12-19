@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import Keyboard from '../../utils/Keyboard';
+import * as FirebaseService from './../../services/FirebaseService';
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
 import { GameContext, GameScreen } from '../../contexts/GameContext';
 
@@ -83,7 +84,21 @@ export default function JoinGameScreen() {
           case InputState.ALIAS: { setInputState(InputState.GAMECODE); break; }
           case InputState.GAMECODE: {
             if (newGameSelected) {
-              gameContext.current.setGameId(gameCode);
+              FirebaseService.CreateGame(gameCode, alias).then(r => {
+                switch (r.status) {
+                  case FirebaseService.FirebaseServiceStatus.SUCCESS: {
+                    console.log(`Response: ${r.response}`);
+                    gameContext.current.setGameId(r.response!);
+                    gameContext.current.setCurrentScreen(GameScreen.PLAYGAME);
+                    break;
+                  }
+                  case FirebaseService.FirebaseServiceStatus.FAILURE: {
+                    // TODO: Display this rather than alert.
+                    alert(r.message);
+                    break;
+                  }
+                }
+              })
             }
             // Join game is selected.
             else {
