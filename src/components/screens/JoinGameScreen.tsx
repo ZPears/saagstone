@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import Keyboard from '../../utils/Keyboard';
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
-import { GameContext } from '../../contexts/GameContext';
+import { GameContext, GameScreen } from '../../contexts/GameContext';
 
 enum InputState {
   ALIAS,
@@ -24,28 +24,29 @@ export default function JoinGameScreen() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
-          if (newGameHighlighted) { setNewGameHighlighted(false); }
-          break;
-        }
-        case keyNameForPicadeInput(PicadeInput.JOYSTICK_UP): {
-          if (!newGameHighlighted) { setNewGameHighlighted(true); }
-          break;
-        }
-        case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
-          // Ignore input if we're joining or creating a game.
-          if (newGameSelected || joinGameSelected) { }
-          else if (newGameHighlighted) { setNewGameSelected(true); }
-          else { setJoinGameSelected(true); }
-          break;
-        }
-        case keyNameForPicadeInput(PicadeInput.BUTTON_B): {
-          if (newGameSelected || joinGameSelected) {
-            setNewGameSelected(false);
-            setJoinGameSelected(false);
+      if (gameContext.current.currentScreen === GameScreen.JOINGAME) {
+        switch (event.key) {
+          case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
+            if (newGameHighlighted) { setNewGameHighlighted(false); }
+            break;
           }
-          break;
+          case keyNameForPicadeInput(PicadeInput.JOYSTICK_UP): {
+            if (!newGameHighlighted) { setNewGameHighlighted(true); }
+            break;
+          }
+          case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
+            gameContext.current.setCurrentScreen(GameScreen.KEYBOARDINPUT);
+            if (newGameHighlighted) { setNewGameSelected(true); }
+            else { setJoinGameSelected(true); }
+            break;
+          }
+          case keyNameForPicadeInput(PicadeInput.BUTTON_B): {
+            if (newGameSelected || joinGameSelected) {
+              setNewGameSelected(false);
+              setJoinGameSelected(false);
+            }
+            break;
+          }
         }
       }
     }
@@ -53,7 +54,7 @@ export default function JoinGameScreen() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [newGameHighlighted, newGameSelected, joinGameSelected]);
+  }, [newGameHighlighted, newGameSelected, joinGameSelected, gameContext]);
 
   function keyboardCallback(char: string, button: PicadeInput): void {
     switch (button) {
@@ -130,7 +131,8 @@ export default function JoinGameScreen() {
               className={formInputStyleFor(InputState.GAMECODE)} />
           </Form.Group>
         </Form>
-        <Keyboard callback={keyboardCallback} />
+        <Keyboard callback={keyboardCallback}
+          previousScreen={GameScreen.JOINGAME} />
         <h3 className="text-centered">
           Press Picade START (or "o" key) to submit!
         </h3>

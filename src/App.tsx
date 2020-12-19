@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import Game from './views/Game';
 import { BrowserRouter, Redirect, Route } from 'react-router-dom';
-import { GameContext } from './contexts/GameContext';
+import { GameContext, GameScreen } from './contexts/GameContext';
 import './scss/App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function App() {
   const [gameId, setGameId] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
+  const [currentScreen, setCurrentScreen] =
+    useState<GameScreen>(GameScreen.JOINGAME);
 
   return (
     <div className="App">
@@ -15,7 +17,9 @@ export default function App() {
         gameId: gameId,
         setGameId: setGameId,
         playerName: playerName,
-        setPlayerName: setPlayerName
+        setPlayerName: setPlayerName,
+        currentScreen: currentScreen,
+        setCurrentScreen: setCurrentScreen
       }}>
         <BrowserRouter>
           <Route path="/" exact component={Game} />

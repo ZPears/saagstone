@@ -1,7 +1,12 @@
 import React from "react";
+import { Card } from 'react-bootstrap';
 
 export default function PlayGameScreen() {
   return (
-    <div><h2>You're playing a game!</h2></div>
+    <Card>
+      <Card.Body>
+
+      </Card.Body>
+    </Card>
   )
 }
