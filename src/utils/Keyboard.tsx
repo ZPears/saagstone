@@ -59,7 +59,7 @@ export default function Keyboard(props: KeyboardProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [selectedRowIdx, selectedColIdx]);
+  }, [selectedRowIdx, selectedColIdx, props]);
 
   function Key(value: string, row: number, col: number) {
     return <Col key={value}

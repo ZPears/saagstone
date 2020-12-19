@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import LoginScreen from './views/LoginScreen';
+import Game from './views/Game';
 import { BrowserRouter, Redirect, Route } from 'react-router-dom';
 import { GameContext } from './contexts/GameContext';
 import './scss/App.scss';
@@ -18,7 +18,7 @@ export default function App() {
         setPlayerName: setPlayerName
       }}>
         <BrowserRouter>
-          <Route path="/" exact component={LoginScreen} />
+          <Route path="/" exact component={Game} />
           <Route render={() => <Redirect to="/" />} />
         </BrowserRouter>
       </GameContext.Provider>

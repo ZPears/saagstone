@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
-import Keyboard from './../../utils/Keyboard';
+import Keyboard from '../../utils/Keyboard';
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
 
-export default function JoinGameModal() {
+export default function JoinGameScreen() {
 
   const [newGameHighlighted, setNewGameHighlighted] = useState<boolean>(true);
   const [newGameSelected, setNewGameSelected] = useState<boolean>(false);
@@ -90,12 +90,14 @@ export default function JoinGameModal() {
       <Card.Body className="card-grid">
         <Form>
           <Form.Group>
-            <Form.Label>Your Alias</Form.Label>
-            <Form.Control required type="textarea" defaultValue={alias} />
+            <Form.Label className={"form-title"}>Your Alias</Form.Label>
+            <Form.Control required type="textarea"
+              defaultValue={alias} className={`form-input${writingAlias ? " selected-input" : ""}`} />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Game Code</Form.Label>
-            <Form.Control required type="textarea" defaultValue={gameCode} />
+            <Form.Label className={"form-title"}>Game Code</Form.Label>
+            <Form.Control required type="textarea"
+              defaultValue={gameCode} className={`form-input${writingAlias ? "" : " selected-input"}`} />
           </Form.Group>
         </Form>
         <Keyboard callback={keyboardCallback} />

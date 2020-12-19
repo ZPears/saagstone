@@ -23,6 +23,21 @@
   height: 35%;
 }
 
+.form-title {
+  text-align: center;
+  font-weight: bold;
+}
+
+.form-input {
+  text-align: center;
+}
+
+.selected-input {
+  border: 5px solid !important;
+  border-color: darkgreen!important;
+  font-weight: bold !important;
+}
+
 .full-line-button {
   width: 90%;
   font-weight: bold
