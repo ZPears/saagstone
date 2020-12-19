@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { keyNameForPicadeInput, PicadeInput } from './../picade/PicadeInputs';
 import { GameContext, GameScreen } from '../contexts/GameContext';

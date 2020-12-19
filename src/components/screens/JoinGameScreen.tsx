@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Badge, Button, Card, Form } from 'react-bootstrap';
 import Keyboard from '../../utils/Keyboard';
 import * as FirebaseService from './../../services/FirebaseService';
@@ -97,6 +97,7 @@ export default function JoinGameScreen() {
           case InputState.ALIAS: { setInputState(InputState.GAMECODE); break; }
           case InputState.GAMECODE: {
             if (newGameSelected) {
+              gameContext.setCurrentScreen(GameScreen.JOINGAME);
               FirebaseService.CreateGame(gameCode, alias).then(r => {
                 switch (r.status) {
                   case FirebaseService.FirebaseServiceStatus.SUCCESS: {
@@ -121,7 +122,7 @@ export default function JoinGameScreen() {
             }
             // Join game is selected.
             else {
-              // Lookup a game.
+              // TODO: implement game joining
             }
           }
         }
@@ -175,7 +176,7 @@ export default function JoinGameScreen() {
   }
 
   return (
-    <Card className="page-centered">
+    <Card className="join-game-screen">
       <h2>
         <Badge variant="danger" style={{ visibility: messageVis }}>
           {message}
