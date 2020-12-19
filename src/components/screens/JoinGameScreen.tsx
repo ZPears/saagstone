@@ -57,7 +57,9 @@ export default function JoinGameScreen() {
       case PicadeInput.BUTTON_A: {
         switch (inputState) {
           case InputState.ALIAS: { setAlias(`${alias}${char}`); break; }
-          case InputState.GAMECODE: { setGameCode(`${gameCode}${char}`); break; }
+          case InputState.GAMECODE: {
+            setGameCode(`${gameCode}${char}`); break;
+          }
         }
         break;
       }
