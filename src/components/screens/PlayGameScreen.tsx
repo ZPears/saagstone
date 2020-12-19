@@ -8,12 +8,12 @@ export default function PlayGameScreen() {
 
   const [gameState, setGameState] = useState<GameI>();
 
-  const gameContext = useRef(useContext(GameContext));
+  const gameContext = useContext(GameContext);
 
   useEffect(() => {
-    if (gameContext.current.gameId &&
-      gameContext.current.currentScreen === GameScreen.PLAYGAME) {
-      FirebaseService.GetActiveGameRef(gameContext.current.gameId)
+    if (gameContext.gameId &&
+      gameContext.currentScreen === GameScreen.PLAYGAME) {
+      FirebaseService.GetActiveGameRef(gameContext.gameId)
         .onSnapshot(doc => setGameState(doc.data() as GameI))
     }
   }, [gameState, gameContext]);

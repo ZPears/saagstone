@@ -20,7 +20,7 @@ export default function Keyboard(props: KeyboardProps) {
   const [selectedRowIdx, setSelectedRowIdx] = useState<number>(0);
   const [selectedColIdx, setSelectedColIdx] = useState<number>(0);
 
-  const gameContext = useRef(useContext(GameContext));
+  const gameContext = useContext(GameContext);
 
   const keyboardTypeScreens = new Set([GameScreen.JOINGAME_KEYBOARDINPUT]);
 
@@ -55,7 +55,7 @@ export default function Keyboard(props: KeyboardProps) {
             break;
           }
           case keyNameForPicadeInput(PicadeInput.BUTTON_B): {
-            gameContext.current.setCurrentScreen(props.previousScreen);
+            gameContext.setCurrentScreen(props.previousScreen);
             break;
           }
           case keyNameForPicadeInput(PicadeInput.BUTTON_X): {

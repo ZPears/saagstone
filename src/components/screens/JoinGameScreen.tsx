@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Button, Card, Form } from 'react-bootstrap';
+import { Badge, Button, Card, Form } from 'react-bootstrap';
 import Keyboard from '../../utils/Keyboard';
 import * as FirebaseService from './../../services/FirebaseService';
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
@@ -20,11 +20,25 @@ export default function JoinGameScreen() {
   const [gameCode, setGameCode] = useState<string>("");
   const [inputState, setInputState] = useState<InputState>(InputState.ALIAS);
 
-  const gameContext = useRef(useContext(GameContext));
+  const [message, setMessage] = useState<string>("");
+  const [messageVis, setMessageVis] = useState<"visible" | "hidden">("hidden");
+
+  const gameContext = useContext(GameContext);
+
+  async function showErrorMessage(msg: string) {
+    setMessage(msg);
+    setMessageVis("visible");
+    return new Promise(_ => {
+      setTimeout(() => {
+        setMessageVis("hidden");
+        setMessage("");
+      }, 3000);
+    });
+  }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (gameContext.current.currentScreen === GameScreen.JOINGAME) {
+      if (gameContext.currentScreen === GameScreen.JOINGAME) {
         switch (event.key) {
           case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
             if (newGameHighlighted) { setNewGameHighlighted(false); }
@@ -35,7 +49,7 @@ export default function JoinGameScreen() {
             break;
           }
           case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
-            gameContext.current.setCurrentScreen(GameScreen.JOINGAME_KEYBOARDINPUT);
+            gameContext.setCurrentScreen(GameScreen.JOINGAME_KEYBOARDINPUT);
             if (newGameHighlighted) { setNewGameSelected(true); }
             else { setJoinGameSelected(true); }
             break;
@@ -83,17 +97,23 @@ export default function JoinGameScreen() {
           case InputState.ALIAS: { setInputState(InputState.GAMECODE); break; }
           case InputState.GAMECODE: {
             if (newGameSelected) {
-              gameContext.current.setCurrentScreen(GameScreen.LOADING);
               FirebaseService.CreateGame(gameCode, alias).then(r => {
                 switch (r.status) {
                   case FirebaseService.FirebaseServiceStatus.SUCCESS: {
-                    gameContext.current.setGameId(r.response!);
-                    gameContext.current.setCurrentScreen(GameScreen.PLAYGAME);
+                    gameContext.setGameId(r.response!);
+                    gameContext.setCurrentScreen(GameScreen.PLAYGAME);
                     break;
                   }
                   case FirebaseService.FirebaseServiceStatus.FAILURE: {
-                    gameContext.current.setCurrentScreen(GameScreen.JOINGAME_KEYBOARDINPUT);
-                    alert(r.message);
+                    // This error message doesn't work because
+                    // it unmounts this and then it remounts as the default,
+                    // after coming back from the loading page.
+                    gameContext
+                      .setCurrentScreen(GameScreen.JOINGAME);
+                    setInputState(InputState.ALIAS);
+                    setAlias("");
+                    setGameCode("");
+                    showErrorMessage(r.message);
                     break;
                   }
                 }
@@ -124,7 +144,7 @@ export default function JoinGameScreen() {
           className="grid-elem2 grid-button">
           Join Existing Game
         </Button>
-      </Card.Body>
+      </Card.Body >
     )
   }
 
@@ -150,12 +170,17 @@ export default function JoinGameScreen() {
         <h3 className="text-centered">
           Press Picade START (or "o" key) to submit!
         </h3>
-      </Card.Body>
+      </Card.Body >
     )
   }
 
   return (
     <Card className="page-centered">
+      <h2>
+        <Badge variant="danger" style={{ visibility: messageVis }}>
+          {message}
+        </Badge>
+      </h2>
       {!(newGameSelected || joinGameSelected) ? JoinMenu() : GameSelector()}
     </Card>
   )
