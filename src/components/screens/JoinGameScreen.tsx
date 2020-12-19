@@ -7,8 +7,7 @@ import { GameContext, GameScreen } from '../../contexts/GameContext';
 
 enum InputState {
   ALIAS,
-  GAMECODE,
-  WAITING
+  GAMECODE
 }
 
 export default function JoinGameScreen() {
@@ -36,7 +35,7 @@ export default function JoinGameScreen() {
             break;
           }
           case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
-            gameContext.current.setCurrentScreen(GameScreen.KEYBOARDINPUT);
+            gameContext.current.setCurrentScreen(GameScreen.JOINGAME_KEYBOARDINPUT);
             if (newGameHighlighted) { setNewGameSelected(true); }
             else { setJoinGameSelected(true); }
             break;
@@ -84,16 +83,16 @@ export default function JoinGameScreen() {
           case InputState.ALIAS: { setInputState(InputState.GAMECODE); break; }
           case InputState.GAMECODE: {
             if (newGameSelected) {
+              gameContext.current.setCurrentScreen(GameScreen.LOADING);
               FirebaseService.CreateGame(gameCode, alias).then(r => {
                 switch (r.status) {
                   case FirebaseService.FirebaseServiceStatus.SUCCESS: {
-                    console.log(`Response: ${r.response}`);
                     gameContext.current.setGameId(r.response!);
                     gameContext.current.setCurrentScreen(GameScreen.PLAYGAME);
                     break;
                   }
                   case FirebaseService.FirebaseServiceStatus.FAILURE: {
-                    // TODO: Display this rather than alert.
+                    gameContext.current.setCurrentScreen(GameScreen.JOINGAME_KEYBOARDINPUT);
                     alert(r.message);
                     break;
                   }

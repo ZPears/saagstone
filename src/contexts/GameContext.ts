@@ -3,8 +3,9 @@ import React from 'react';
 // Used in UseEffects to check what screen we're on,
 // and therefore whether the event listeners should trigger.
 export enum GameScreen {
+  LOADING,
   JOINGAME,
-  KEYBOARDINPUT,
+  JOINGAME_KEYBOARDINPUT,
   PLAYGAME
 }
 

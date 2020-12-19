@@ -22,10 +22,16 @@ export default function Keyboard(props: KeyboardProps) {
 
   const gameContext = useRef(useContext(GameContext));
 
+  const keyboardTypeScreens = new Set([GameScreen.JOINGAME_KEYBOARDINPUT]);
+
+  function GameScreenIsKeyboardType(screen: GameScreen) {
+    return keyboardTypeScreens.has(screen);
+  }
+
   // TODO: figure out why I can't repeat a character selection.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (gameContext.current.currentScreen === GameScreen.KEYBOARDINPUT) {
+      if (GameScreenIsKeyboardType(GameScreen.JOINGAME_KEYBOARDINPUT)) {
         switch (event.key) {
           case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
             setSelectedRowIdx(Math.min(3, selectedRowIdx + 1));

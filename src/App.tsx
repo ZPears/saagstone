@@ -6,6 +6,7 @@ import './scss/App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function App() {
+  // TODO: Make this one state that's a GameState
   const [gameId, setGameId] = useState<string | undefined>(undefined);
   const [playerName, setPlayerName] = useState<string>("");
   const [currentScreen, setCurrentScreen] =
