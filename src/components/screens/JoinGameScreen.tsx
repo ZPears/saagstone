@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import Keyboard from '../../utils/Keyboard';
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
+import { GameContext } from '../../contexts/GameContext';
 
 enum InputState {
   ALIAS,
@@ -18,6 +19,8 @@ export default function JoinGameScreen() {
   const [alias, setAlias] = useState<string>("");
   const [gameCode, setGameCode] = useState<string>("");
   const [inputState, setInputState] = useState<InputState>(InputState.ALIAS);
+
+  const gameContext = useRef(useContext(GameContext));
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -79,7 +82,7 @@ export default function JoinGameScreen() {
           case InputState.ALIAS: { setInputState(InputState.GAMECODE); break; }
           case InputState.GAMECODE: {
             if (newGameSelected) {
-              // Create a new game.
+              gameContext.current.setGameId(gameCode);
             }
             // Join game is selected.
             else {
