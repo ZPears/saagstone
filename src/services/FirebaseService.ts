@@ -37,7 +37,13 @@ export async function CreateGame(gameId: string, playerAlias: string):
         `Active game with ID ${gameId} already exists!`
       );
     } else {
-      return gameDocRef.set({ playerOneAlias: playerAlias, gameId: gameId })
+      return gameDocRef.set({
+        playerOneAlias: playerAlias,
+        gameId: gameId,
+        playerOneTurn: true,
+        playerOneMana: 1,
+        playerTwoMana: 1
+      })
         .then(_ => FirebaseSuccess(doc.id))
         .catch(err =>
           FirebaseFailure<string>(err)
