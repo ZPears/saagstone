@@ -5,10 +5,12 @@ export default interface GameI {
   playerOnesTurn: boolean,
   playerOneAlias: string,
   playerOneHand?: CardI[],
+  playerOneDeck?: CardI[],
   playerOneBoard?: CardI[],
   playerOneMana: number;
   playerTwoAlias?: string,
   playerTwoHand?: CardI[],
+  playerTwoDeck?: CardI[],
   playerTwoBoard?: CardI[],
   playerTwoMana: number;
 }

@@ -43,14 +43,22 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
         `Active game with ID ${data.gameId} already exists!`
       );
     } else {
-      return gameDocRef.set({
-        playerOneAlias: data.playerAlias,
-        gameId: data.gameId,
-        playerOneTurn: true,
-        playerOneMana: 1,
-        playerTwoMana: 1
-      }).then(_ => FirebaseSuccess(doc.id))
-        .catch(err => FirebaseFailure<string>(err))
+      return db.collection("cards").listDocuments().then(cards => {
+        // TODO: Draw cards randomly and initialize hand randomly.
+        // Also actually get the cards, these are just the card IDs.
+        return gameDocRef.set({
+          playerOneAlias: data.playerAlias,
+          gameId: data.gameId,
+          playerOneTurn: true,
+          playerOneMana: 1,
+          playerTwoMana: 1,
+          playerOneDeck: cards,
+          playerOneHand: cards,
+          playerTwoDeck: cards,
+          playerTwoHand: cards,
+        }).then(_ => FirebaseSuccess(doc.id))
+          .catch(err => FirebaseFailure<string>(err))
+      }).catch(err => FirebaseFailure<string>(err))
     }
   }).catch(err => FirebaseFailure<string>(err))
 

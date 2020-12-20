@@ -30,9 +30,11 @@ export default function PlayGameScreen() {
           <Row xs={3} md={3} lg={3} className="gameboard-header">
             <Col><b>Game Id:</b> {gameState?.gameId}</Col>
             <Col><b>Player One</b>: {gameState?.playerOneAlias}{"  "}
-              <b>Mana:</b> {gameState?.playerOneMana}</Col>
+              <b>Mana:</b> {gameState?.playerOneMana}{"  "}
+              <b>Deck Size:</b>{gameState?.playerOneDeck?.length}</Col>
             <Col><b>Player Two</b>: {gameState?.playerTwoAlias}{"  "}
-              <b>Mana:</b> {gameState?.playerTwoMana}</Col>
+              <b>Mana:</b> {gameState?.playerTwoMana}{"  "}
+              <b>Deck Size:</b>{gameState?.playerTwoDeck?.length}</Col>
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
             {gameState?.playerTwoHand?.map(c => GameCard(c))}
