@@ -1,25 +1,26 @@
-import { DH_CHECK_P_NOT_PRIME } from 'constants';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import 'firebase/functions';
 import firebaseConfig from './config';
 
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+const fns = firebase.functions();
 
 export enum FirebaseServiceStatus { SUCCESS, FAILURE }
 
-interface FirebaseResponse<T> {
+export interface FirebaseResponse<T> {
   status: FirebaseServiceStatus,
   message: string,
   response?: T
 }
 
-function FirebaseSuccess<T>(r: T): FirebaseResponse<T> {
+export function FirebaseSuccess<T>(r: T): FirebaseResponse<T> {
   return { status: FirebaseServiceStatus.SUCCESS, message: "", response: r }
 }
 
-function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
+export function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
   return {
     status: FirebaseServiceStatus.FAILURE,
     message: msg,
@@ -29,27 +30,10 @@ function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
 
 export async function CreateGame(gameId: string, playerAlias: string):
   Promise<FirebaseResponse<string>> {
-  const gameDocRef: firebase.firestore.DocumentReference =
-    db.collection("activeGames").doc(gameId);
-  return gameDocRef.get().then(doc => {
-    if (doc.exists) {
-      return FirebaseFailure<string>(
-        `Active game with ID ${gameId} already exists!`
-      );
-    } else {
-      return gameDocRef.set({
-        playerOneAlias: playerAlias,
-        gameId: gameId,
-        playerOneTurn: true,
-        playerOneMana: 1,
-        playerTwoMana: 1
-      })
-        .then(_ => FirebaseSuccess(doc.id))
-        .catch(err =>
-          FirebaseFailure<string>(err)
-        );
-    }
-  }).catch(err => FirebaseFailure<string>(err));
+  const fn = fns.httpsCallable("newRandomDeckGame");
+  return fn({ gameId, playerAlias })
+    .then(resp => resp.data as FirebaseResponse<string>)
+    .catch(err => err.data as FirebaseResponse<string>)
 }
 
 export function GetActiveGameRef(gameId: string):
