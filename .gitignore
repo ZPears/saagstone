@@ -7,3 +7,5 @@ package-lock.json
 yarn.lock
 
 src/services/config.ts
+
+functions/firebase-debug.log
