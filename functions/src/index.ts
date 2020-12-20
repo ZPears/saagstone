@@ -1,8 +1,27 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { FirebaseFailure, FirebaseSuccess } from './../../src/services/FirebaseService';
 
 admin.initializeApp(functions.firebaseConfig()!);
+
+export enum FirebaseServiceStatus { SUCCESS, FAILURE }
+
+export interface FirebaseResponse<T> {
+  status: FirebaseServiceStatus,
+  message: string,
+  response?: T
+}
+
+export function FirebaseSuccess<T>(r: T): FirebaseResponse<T> {
+  return { status: FirebaseServiceStatus.SUCCESS, message: "", response: r }
+}
+
+export function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
+  return {
+    status: FirebaseServiceStatus.FAILURE,
+    message: msg,
+    response: undefined
+  }
+}
 
 const db = admin.firestore();
 
@@ -28,9 +47,9 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
         playerOneTurn: true,
         playerOneMana: 1,
         playerTwoMana: 1
-      }).then(_ => { return FirebaseSuccess(doc.id) })
-        .catch(err => { return FirebaseFailure<string>(err) })
+      }).then(_ => FirebaseSuccess(doc.id))
+        .catch(err => FirebaseFailure<string>(err))
     }
-  }).catch(err => { return FirebaseFailure<string>(err) })
+  }).catch(err => FirebaseFailure<string>(err))
 
 })
