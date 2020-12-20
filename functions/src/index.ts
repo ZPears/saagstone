@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp(functions.firebaseConfig()!);
 
+// ALSO CHANGE IN ../src/services/FirebaseService.ts
 export enum FirebaseServiceStatus { SUCCESS, FAILURE }
 
 export interface FirebaseResponse<T> {
@@ -22,6 +23,7 @@ export function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
     response: undefined
   }
 }
+// ALSO CHANGE IN ../src/services/FirebaseService.ts
 
 const db = admin.firestore();
 

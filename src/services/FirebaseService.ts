@@ -8,6 +8,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const fns = firebase.functions();
 
+// ALSO CHANGE IN functions/src/index.ts
 export enum FirebaseServiceStatus { SUCCESS, FAILURE }
 
 export interface FirebaseResponse<T> {
@@ -27,6 +28,7 @@ export function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
     response: undefined
   }
 }
+// ALSO CHANGE IN functions/src/index.ts
 
 export async function CreateGame(gameId: string, playerAlias: string):
   Promise<FirebaseResponse<string>> {
