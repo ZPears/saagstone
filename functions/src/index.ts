@@ -1,5 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import DocumentReference = admin.firestore.DocumentReference;
+import DocumentData = admin.firestore.DocumentData;
 
 admin.initializeApp(functions.firebaseConfig()!);
 
@@ -25,7 +27,43 @@ export function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
 }
 // ALSO CHANGE IN ../src/services/FirebaseService.ts
 
+// ALSO CHANGE IN ../src/interfaces/CardI.ts
+export type CardType = "minion" | "spell";
+
+export default interface CardI {
+  cardId: string,
+  cardName: string,
+  cardType: CardType,
+  baseAttack: number,
+  baseHealth: number,
+  currentHealth?: number,
+  currentAttack?: number,
+}
+// ALSO CHANGE IN ../src/interfaces/CardI.ts
+
+const DECK_SIZE = 30;
+
 const db = admin.firestore();
+
+// n integers in the interval[0, 1)
+function randomIdxs(max: number, n: number) {
+  return new Array(n).map(_ => Math.floor(Math.random() * Math.floor(max)))
+}
+
+function randomShuffle<T>(a: T, b: T) {
+  return Math.random() - 0.5;
+}
+
+function randomDeck(cardIds: DocumentReference<DocumentData>[]):
+  Map<DocumentReference<DocumentData>, number> {
+  return randomIdxs(cardIds.length, DECK_SIZE)
+    .map(idx => cardIds[idx])
+    .reduce((deck: Map<DocumentReference<DocumentData>, number>, cardId: DocumentReference<DocumentData>) => {
+      if (deck.get(cardId)) { deck.set(cardId, deck.get(cardId)! + 1) }
+      else { deck.set(cardId, 1) }
+      return deck;
+    }, new Map<DocumentReference<DocumentData>, number>());
+}
 
 export const newRandomDeckGame = functions.https.onCall((data) => {
   if (data.gameId === undefined) {
@@ -43,23 +81,34 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
         `Active game with ID ${data.gameId} already exists!`
       );
     } else {
-      return db.collection("cards").listDocuments().then(cards => {
-        // TODO: Draw cards randomly and initialize hand randomly.
-        // Also actually get the cards, these are just the card IDs.
-        return gameDocRef.set({
-          playerOneAlias: data.playerAlias,
-          gameId: data.gameId,
-          playerOneTurn: true,
-          playerOneMana: 1,
-          playerTwoMana: 1,
-          playerOneDeck: cards,
-          playerOneHand: cards,
-          playerTwoDeck: cards,
-          playerTwoHand: cards,
-        }).then(_ => FirebaseSuccess(doc.id))
-          .catch(err => FirebaseFailure<string>(err))
-      }).catch(err => FirebaseFailure<string>(err))
+      return db.collection("cards").listDocuments()
+        .then((cardIds: DocumentReference<DocumentData>[]) => {
+          // TODO: Have two different decks per player.
+          const deck: Map<DocumentReference<DocumentData>, number> =
+            randomDeck(cardIds);
+
+          const deckCardRefs = Array.from(deck.keys());
+
+          return db.getAll(...deckCardRefs).then(cardResps => {
+            const cards: CardI[] = cardResps.map(x => x.data()! as CardI);
+            let playerOneDeck = cards.sort(randomShuffle);
+            let playerTwoDeck = cards.sort(randomShuffle);
+            const playerOneHand = playerOneDeck.splice(0, 4);
+            const playerTwoHand = playerOneDeck.splice(0, 4);
+            return gameDocRef.set({
+              playerOneAlias: data.playerAlias,
+              gameId: data.gameId,
+              playerOneTurn: true,
+              playerOneMana: 1,
+              playerTwoMana: 1,
+              playerOneDeck: playerOneDeck,
+              playerOneHand: playerOneHand,
+              playerTwoDeck: playerTwoDeck,
+              playerTwoHand: playerTwoHand
+            }).then(_ => FirebaseSuccess(doc.id))
+              .catch(err => FirebaseFailure<string>(err))
+          }).catch(err => FirebaseFailure<string>(err))
+        }).catch(err => FirebaseFailure<string>(err))
     }
   }).catch(err => FirebaseFailure<string>(err))
-
 })
