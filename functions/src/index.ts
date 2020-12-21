@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import DocumentReference = admin.firestore.DocumentReference;
 import DocumentData = admin.firestore.DocumentData;
+import QuerySnapshot = admin.firestore.QuerySnapshot;
+import QueryDocumentSnapshot = admin.firestore.QueryDocumentSnapshot;
 
 admin.initializeApp(functions.firebaseConfig()!);
 
@@ -54,15 +55,16 @@ function randomShuffle<T>(a: T, b: T) {
   return Math.random() - 0.5;
 }
 
-function randomDeck(cardIds: DocumentReference<DocumentData>[]):
-  Map<DocumentReference<DocumentData>, number> {
-  return randomIdxs(cardIds.length, DECK_SIZE)
-    .map(idx => cardIds[idx])
-    .reduce((deck: Map<DocumentReference<DocumentData>, number>, cardId: DocumentReference<DocumentData>) => {
+function randomDeck(cards: QueryDocumentSnapshot<DocumentData>[]):
+  Map<QueryDocumentSnapshot<DocumentData>, number> {
+  return randomIdxs(cards.length, DECK_SIZE)
+    .map(idx => cards[idx])
+    .reduce((deck: Map<QueryDocumentSnapshot<DocumentData>, number>,
+      cardId: QueryDocumentSnapshot<DocumentData>) => {
       if (deck.get(cardId)) { deck.set(cardId, deck.get(cardId)! + 1) }
       else { deck.set(cardId, 1) }
       return deck;
-    }, new Map<DocumentReference<DocumentData>, number>());
+    }, new Map<QueryDocumentSnapshot<DocumentData>, number>());
 }
 
 export const newRandomDeckGame = functions.https.onCall((data) => {
@@ -82,40 +84,42 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
       );
     } else {
       return db.collection("cards").get()
-        .then((cardIds: QuerySnapshot<DocumentData>) => {
+        .then((cardsSnapshot: QuerySnapshot<DocumentData>) => {
           // TODO: Have two different decks per player.
-          const deck: Map<DocumentReference<DocumentData>, number> =
-            randomDeck(cardIds);
+          console.log(`ALL CARDS: ${cardsSnapshot.docs.map(x => (x.data()! as CardI)).toString()}`)
+          const deck: Map<QueryDocumentSnapshot<DocumentData>, number> =
+            randomDeck(cardsSnapshot.docs);
 
-          console.log(`found ${cardIds.length} cards`);
+          // TODO: Something is wrong here, seems this is coming out empty.
+          console.log(`RANDOM CARDS: ${deck.size}`)
 
-          const deckCardRefs = Array.from(deck.keys());
+          const deckCardRefs: QueryDocumentSnapshot<DocumentData>[] =
+            Array.from(deck.keys());
 
-          return db.getAll(...deckCardRefs).then(cardResps => {
-            console.log(`got all ${cardResps.length} cardResps`);
-            const cards: CardI[] = cardResps.map(x => x.data()! as CardI);
-            let playerOneDeck = cards.sort(randomShuffle);
-            let playerTwoDeck = cards.sort(randomShuffle);
-            const playerOneHand = playerOneDeck.splice(0, 4);
-            const playerTwoHand = playerOneDeck.splice(0, 4);
-            console.log(`made the hands`);
-            return gameDocRef.set({
-              playerOneAlias: data.playerAlias,
-              gameId: data.gameId,
-              playerOneTurn: true,
-              playerOneMana: 1,
-              playerTwoMana: 1,
-              playerOneDeck: playerOneDeck,
-              playerOneHand: playerOneHand,
-              playerTwoDeck: playerTwoDeck,
-              playerTwoHand: playerTwoHand
-            }).then(_ => FirebaseSuccess(doc.id))
-              .catch(err =>
-                FirebaseFailure<string>(`Game Write Failure: ${err.toString()}`))
-          }).catch(err =>
-            FirebaseFailure<string>(`Fetch cardReps failure: ${err.toString()}`))
+          const deckCards: CardI[] = deckCardRefs.map(x => x.data()! as CardI);
+
+          console.log(`DECK CARDS: ${deckCards.map(x => x.toString())}`)
+
+          let playerOneDeck = deckCards.sort(randomShuffle);
+          let playerTwoDeck = deckCards.sort(randomShuffle);
+          const playerOneHand = playerOneDeck.splice(0, 4);
+          const playerTwoHand = playerOneDeck.splice(0, 4);
+          return gameDocRef.set({
+            playerOneAlias: data.playerAlias,
+            gameId: data.gameId,
+            playerOneTurn: true,
+            playerOneMana: 1,
+            playerTwoMana: 1,
+            playerOneDeck: playerOneDeck,
+            playerOneHand: playerOneHand,
+            playerTwoDeck: playerTwoDeck,
+            playerTwoHand: playerTwoHand
+          }).then(_ => FirebaseSuccess(doc.id))
+            .catch(err =>
+              FirebaseFailure<string>(`Game Write Failure: ${err.toString()}`))
         }).catch(err =>
-          FirebaseFailure<string>(`ListDocuments failure: ${err.toString()}`))
+          FirebaseFailure<string>(`Fetch cards failure: ${err.toString()}`))
     }
-  }).catch(err => FirebaseFailure<string>(`Total failure: ${err.toString()}`))
+  }).catch(err =>
+    FirebaseFailure<string>(`Total failure: ${err.toString()}`))
 })
