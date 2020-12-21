@@ -81,20 +81,24 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
         `Active game with ID ${data.gameId} already exists!`
       );
     } else {
-      return db.collection("cards").listDocuments()
-        .then((cardIds: DocumentReference<DocumentData>[]) => {
+      return db.collection("cards").get()
+        .then((cardIds: QuerySnapshot<DocumentData>) => {
           // TODO: Have two different decks per player.
           const deck: Map<DocumentReference<DocumentData>, number> =
             randomDeck(cardIds);
 
+          console.log(`found ${cardIds.length} cards`);
+
           const deckCardRefs = Array.from(deck.keys());
 
           return db.getAll(...deckCardRefs).then(cardResps => {
+            console.log(`got all ${cardResps.length} cardResps`);
             const cards: CardI[] = cardResps.map(x => x.data()! as CardI);
             let playerOneDeck = cards.sort(randomShuffle);
             let playerTwoDeck = cards.sort(randomShuffle);
             const playerOneHand = playerOneDeck.splice(0, 4);
             const playerTwoHand = playerOneDeck.splice(0, 4);
+            console.log(`made the hands`);
             return gameDocRef.set({
               playerOneAlias: data.playerAlias,
               gameId: data.gameId,
@@ -106,9 +110,12 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
               playerTwoDeck: playerTwoDeck,
               playerTwoHand: playerTwoHand
             }).then(_ => FirebaseSuccess(doc.id))
-              .catch(err => FirebaseFailure<string>(err))
-          }).catch(err => FirebaseFailure<string>(err))
-        }).catch(err => FirebaseFailure<string>(err))
+              .catch(err =>
+                FirebaseFailure<string>(`Game Write Failure: ${err.toString()}`))
+          }).catch(err =>
+            FirebaseFailure<string>(`Fetch cardReps failure: ${err.toString()}`))
+        }).catch(err =>
+          FirebaseFailure<string>(`ListDocuments failure: ${err.toString()}`))
     }
-  }).catch(err => FirebaseFailure<string>(err))
+  }).catch(err => FirebaseFailure<string>(`Total failure: ${err.toString()}`))
 })
