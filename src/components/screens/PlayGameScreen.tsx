@@ -19,10 +19,22 @@ export default function PlayGameScreen() {
     }
   }, [gameState, gameContext]);
 
-  function GameCard(cardData: CardI) {
-    return <div><p>Card: {cardData.cardName}</p></div>
+  function FaceUpCard(cardData: CardI) {
+    return (
+      <div className="face-up-card">
+        <p>Name: {cardData.cardName}</p>
+        <p>Attack: {cardData.baseAttack}</p>
+        <p>Health: {cardData.baseHealth}</p>
+        <p>Type: {cardData.cardType}</p>
+      </div>
+    )
   }
 
+  function FaceDownCard(cardData: CardI) {
+    return <div className="face-down-card"></div>
+  }
+
+  // TODO: Pass in context here of what player you are (one or two)
   return (
     <Card className="play-game-screen">
       <Card.Body>
@@ -37,16 +49,16 @@ export default function PlayGameScreen() {
               <b>Deck Size:</b>{gameState?.playerTwoDeck?.length}</Col>
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerTwoHand?.map(c => GameCard(c))}
+            {gameState?.playerTwoHand?.map(c => FaceDownCard(c))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerTwoBoard?.map(c => GameCard(c))}
+            {gameState?.playerTwoBoard?.map(c => FaceUpCard(c))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerOneBoard?.map(c => GameCard(c))}
+            {gameState?.playerOneBoard?.map(c => FaceUpCard(c))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerOneHand?.map(c => GameCard(c))}
+            {gameState?.playerOneHand?.map(c => FaceUpCard(c))}
           </Row>
         </Container>
       </Card.Body>

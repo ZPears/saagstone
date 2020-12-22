@@ -9,5 +9,23 @@
 
 .play-game-screen {
   width: 90%;
-  height: 60%;
+  height: 62%;
+}
+
+.face-down-card {
+	background-image: url('./../static/cardback.png');
+	background-repeat: no-repeat;
+	background-size: cover;
+  background-position: center;
+  height: 13em;
+  width: 9em;
+  margin: 3px;
+}
+
+.face-up-card {
+  height: 13em;
+  width: 9em;
+  text-align: center;
+  border: 1px solid;
+  margin: 3px;
 }
