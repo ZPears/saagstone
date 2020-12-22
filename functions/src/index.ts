@@ -87,12 +87,8 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
       return db.collection("cards").get()
         .then((cardsSnapshot: QuerySnapshot<DocumentData>) => {
           // TODO: Have two different decks per player.
-          console.log(`ALL CARDS: ${cardsSnapshot.docs.map(x => (x.data()! as CardI)).toString()}`)
           const deck: Map<QueryDocumentSnapshot<DocumentData>, number> =
             randomDeck(cardsSnapshot.docs);
-
-          // TODO: Something is wrong here, seems this is coming out empty.
-          console.log(`RANDOM CARDS: ${deck}`)
 
           const deckCards: CardI[] =
             Array.from(deck.entries()).flatMap(([k, v]) => {

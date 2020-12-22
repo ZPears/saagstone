@@ -35,6 +35,8 @@ export default function PlayGameScreen() {
   }
 
   // TODO: Pass in context here of what player you are (one or two)
+  // TODO: Spell cards should have a target as part of their data structure.
+  //       That way they can start off targeting the right part of the board.
   return (
     <Card className="play-game-screen">
       <Card.Body>
