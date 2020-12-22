@@ -92,19 +92,17 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
             randomDeck(cardsSnapshot.docs);
 
           // TODO: Something is wrong here, seems this is coming out empty.
-          console.log(`RANDOM CARDS: ${deck.size}`)
+          console.log(`RANDOM CARDS: ${deck}`)
 
-          const deckCardRefs: QueryDocumentSnapshot<DocumentData>[] =
-            Array.from(deck.keys());
+          const deckCards: CardI[] =
+            Array.from(deck.entries()).flatMap(([k, v]) => {
+              return Array(v).fill(k.data()! as CardI);
+            });
 
-          const deckCards: CardI[] = deckCardRefs.map(x => x.data()! as CardI);
-
-          console.log(`DECK CARDS: ${deckCards.map(x => x.toString())}`)
-
-          let playerOneDeck = deckCards.sort(randomShuffle);
-          let playerTwoDeck = deckCards.sort(randomShuffle);
+          let playerOneDeck = [...deckCards].sort(randomShuffle);
+          let playerTwoDeck = [...deckCards].sort(randomShuffle);
           const playerOneHand = playerOneDeck.splice(0, 4);
-          const playerTwoHand = playerOneDeck.splice(0, 4);
+          const playerTwoHand = playerTwoDeck.splice(0, 4);
           return gameDocRef.set({
             playerOneAlias: data.playerAlias,
             gameId: data.gameId,
