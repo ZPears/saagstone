@@ -48,7 +48,8 @@ const db = admin.firestore();
 
 // n integers in the interval[0, 1)
 function randomIdxs(max: number, n: number) {
-  return new Array(n).map(_ => Math.floor(Math.random() * Math.floor(max)))
+  return Array.from(Array(n).keys())
+    .map(_ => Math.floor(Math.random() * Math.floor(max)))
 }
 
 function randomShuffle<T>(a: T, b: T) {
