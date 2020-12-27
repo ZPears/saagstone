@@ -70,6 +70,28 @@ export default function JoinGameScreen() {
     }
   }, [newGameHighlighted, newGameSelected, joinGameSelected, gameContext]);
 
+  function handleFirebaseResponse(r: FirebaseService.FirebaseResponse<string>) {
+    switch (r.status) {
+      case FirebaseService.FirebaseServiceStatus.SUCCESS: {
+        gameContext.setGameId(r.response!);
+        gameContext.setCurrentScreen(GameScreen.PLAYGAME);
+        break;
+      }
+      case FirebaseService.FirebaseServiceStatus.FAILURE: {
+        // This error message doesn't work because
+        // it unmounts this and then it remounts as the default,
+        // after coming back from the loading page.
+        gameContext
+          .setCurrentScreen(GameScreen.JOINGAME);
+        setInputState(InputState.ALIAS);
+        setAlias("");
+        setGameCode("");
+        showErrorMessage(r.message);
+        break;
+      }
+    }
+  }
+
   function keyboardCallback(char: string, button: PicadeInput): void {
     switch (button) {
       case PicadeInput.BUTTON_A: {
@@ -99,30 +121,15 @@ export default function JoinGameScreen() {
             if (newGameSelected) {
               gameContext.setCurrentScreen(GameScreen.JOINGAME);
               FirebaseService.CreateGame(gameCode, alias).then(r => {
-                switch (r.status) {
-                  case FirebaseService.FirebaseServiceStatus.SUCCESS: {
-                    gameContext.setGameId(r.response!);
-                    gameContext.setCurrentScreen(GameScreen.PLAYGAME);
-                    break;
-                  }
-                  case FirebaseService.FirebaseServiceStatus.FAILURE: {
-                    // This error message doesn't work because
-                    // it unmounts this and then it remounts as the default,
-                    // after coming back from the loading page.
-                    gameContext
-                      .setCurrentScreen(GameScreen.JOINGAME);
-                    setInputState(InputState.ALIAS);
-                    setAlias("");
-                    setGameCode("");
-                    showErrorMessage(r.message);
-                    break;
-                  }
-                }
+                handleFirebaseResponse(r);
               })
             }
             // Join game is selected.
             else {
-              // TODO: implement game joining
+              gameContext.setCurrentScreen(GameScreen.JOINGAME);
+              FirebaseService.JoinGame(gameCode, alias).then(r => {
+                handleFirebaseResponse(r);
+              })
             }
           }
         }

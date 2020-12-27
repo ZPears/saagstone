@@ -31,7 +31,7 @@ export function FirebaseFailure<T>(msg: string): FirebaseResponse<T> {
 // ALSO CHANGE IN ../src/interfaces/CardI.ts
 export type CardType = "minion" | "spell";
 
-export default interface CardI {
+export interface CardI {
   cardId: string,
   cardName: string,
   cardType: CardType,
@@ -41,6 +41,25 @@ export default interface CardI {
   currentAttack?: number,
 }
 // ALSO CHANGE IN ../src/interfaces/CardI.ts
+
+// ALSO CHANGE IN ../src/interfaces/GameI.ts
+export interface GameI {
+  gameId: string,
+  playerOnesTurn: boolean,
+  playerOneAlias: string,
+  playerOneHand?: CardI[],
+  playerOneDeck?: CardI[],
+  playerOneBoard?: CardI[],
+  playerOneMana: number;
+  playerTwoAlias?: string,
+  playerTwoHand?: CardI[],
+  playerTwoDeck?: CardI[],
+  playerTwoBoard?: CardI[],
+  playerTwoMana: number;
+}
+// ALSO CHANGE IN ../src/interfaces/GameI.ts
+
+
 
 const DECK_SIZE = 30;
 
@@ -68,6 +87,8 @@ function randomDeck(cards: QueryDocumentSnapshot<DocumentData>[]):
     }, new Map<QueryDocumentSnapshot<DocumentData>, number>());
 }
 
+
+// API FUNCTIONS
 export const newRandomDeckGame = functions.https.onCall((data) => {
   if (data.gameId === undefined) {
     return FirebaseFailure("No gameId provided.")
@@ -117,4 +138,36 @@ export const newRandomDeckGame = functions.https.onCall((data) => {
     }
   }).catch(err =>
     FirebaseFailure<string>(`Total failure: ${err.toString()}`))
+})
+
+export const joinGame = functions.https.onCall((data) => {
+  if (data.gameId === undefined) {
+    return FirebaseFailure("No gameId provided.")
+  }
+  if (data.playerAlias === undefined) {
+    return FirebaseFailure("No playerAlias provided.")
+  }
+
+  const gameDocRef = db.collection("activeGames").doc(data.gameId);
+
+  return gameDocRef.get().then(doc => {
+    if (!doc.exists) {
+      return FirebaseFailure<string>(
+        `No game with ID ${data.gameId} exists!`
+      );
+    } else {
+      const game = doc.data()! as GameI;
+      if (game.playerOneAlias === data.playerAlias ||
+        game.playerTwoAlias === data.playerAlias) {
+        return FirebaseSuccess<string>(game.gameId);
+      }
+      else if (game.playerTwoAlias) {
+        return FirebaseFailure<string>(
+          `No player slots available in game ${data.gameId}`);
+      } else {
+        gameDocRef.update({ "playerTwoAlias": data.playerAlias })
+        return FirebaseSuccess<string>(game.gameId);
+      }
+    }
+  })
 })

@@ -1,5 +1,6 @@
 export type CardType = "minion" | "spell";
 
+// ALSO CHANGE IN ../../functions
 export default interface CardI {
   cardId: string,
   cardName: string,
@@ -9,3 +10,4 @@ export default interface CardI {
   currentHealth?: number,
   currentAttack?: number,
 }
+// ALSO CHANGE IN ../../functions

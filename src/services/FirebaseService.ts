@@ -42,3 +42,11 @@ export function GetActiveGameRef(gameId: string):
   firebase.firestore.DocumentReference {
   return db.collection("activeGames").doc(gameId);
 }
+
+export async function JoinGame(gameId: string, playerAlias: string):
+  Promise<FirebaseResponse<string>> {
+  const fn = fns.httpsCallable("joinGame");
+  return fn({ gameId, playerAlias })
+    .then(resp => resp.data as FirebaseResponse<string>)
+    .catch(err => err.data as FirebaseResponse<string>)
+}

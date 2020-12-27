@@ -1,5 +1,6 @@
 import CardI from "./CardI";
 
+// ALSO CHANGE IN ../../functions
 export default interface GameI {
   gameId: string,
   playerOnesTurn: boolean,
@@ -14,3 +15,4 @@ export default interface GameI {
   playerTwoBoard?: CardI[],
   playerTwoMana: number;
 }
+// ALSO CHANGE IN ../../functions
