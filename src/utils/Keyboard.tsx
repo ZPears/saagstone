@@ -34,19 +34,19 @@ export default function Keyboard(props: KeyboardProps) {
       if (GameScreenIsKeyboardType(GameScreen.JOINGAME_KEYBOARDINPUT)) {
         switch (event.key) {
           case keyNameForPicadeInput(PicadeInput.JOYSTICK_DOWN): {
-            setSelectedRowIdx(Math.min(3, selectedRowIdx + 1));
+            setSelectedRowIdx((selectedRowIdx + 1) % 4);
             break;
           }
           case keyNameForPicadeInput(PicadeInput.JOYSTICK_UP): {
-            setSelectedRowIdx(Math.max(0, selectedRowIdx - 1));
+            setSelectedRowIdx(selectedRowIdx === 0 ? 3 : selectedRowIdx - 1);
             break;
           }
           case keyNameForPicadeInput(PicadeInput.JOYSTICK_LEFT): {
-            setSelectedColIdx(Math.max(0, selectedColIdx - 1));
+            setSelectedColIdx(selectedColIdx === 0 ? 9 : selectedColIdx - 1);
             break;
           }
           case keyNameForPicadeInput(PicadeInput.JOYSTICK_RIGHT): {
-            setSelectedColIdx(Math.min(9, selectedColIdx + 1));
+            setSelectedColIdx((selectedColIdx + 1) % 10);
             break;
           }
           case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
