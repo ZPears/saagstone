@@ -73,7 +73,9 @@ export default function JoinGameScreen() {
   function handleFirebaseResponse(r: FirebaseService.FirebaseResponse<string>) {
     switch (r.status) {
       case FirebaseService.FirebaseServiceStatus.SUCCESS: {
+        // TODO: Make a function to set all of these at once.
         gameContext.setGameId(r.response!);
+        gameContext.setPlayerName(alias);
         gameContext.setCurrentScreen(GameScreen.PLAYGAME);
         break;
       }

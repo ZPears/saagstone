@@ -7,6 +7,7 @@ export default interface CardI {
   cardType: CardType,
   baseAttack: number,
   baseHealth: number,
+  manaCost: number,
   currentHealth?: number,
   currentAttack?: number,
 }

@@ -26,12 +26,17 @@ export default function PlayGameScreen() {
         <p>Attack: {cardData.baseAttack}</p>
         <p>Health: {cardData.baseHealth}</p>
         <p>Type: {cardData.cardType}</p>
+        <p>Cost: {cardData.manaCost}</p>
       </div>
     )
   }
 
   function FaceDownCard(cardData: CardI) {
     return <div className="face-down-card"></div>
+  }
+
+  function playerIsPlayerOne(): boolean | undefined {
+    return gameState?.playerOneAlias === gameContext.playerName;
   }
 
   // TODO: Pass in context here of what player you are (one or two)
@@ -51,16 +56,24 @@ export default function PlayGameScreen() {
               <b>Deck Size:</b>{gameState?.playerTwoDeck?.length}</Col>
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerTwoHand?.map(c => FaceDownCard(c))}
+            {playerIsPlayerOne() ?
+              gameState?.playerTwoHand?.map(c => FaceDownCard(c)) :
+              gameState?.playerOneHand?.map(c => FaceDownCard(c))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerTwoBoard?.map(c => FaceUpCard(c))}
+            {playerIsPlayerOne() ?
+              gameState?.playerTwoBoard?.map(c => FaceUpCard(c)) :
+              gameState?.playerOneBoard?.map(c => FaceUpCard(c))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerOneBoard?.map(c => FaceUpCard(c))}
+            {playerIsPlayerOne() ?
+              gameState?.playerOneBoard?.map(c => FaceUpCard(c)) :
+              gameState?.playerTwoBoard?.map(c => FaceUpCard(c))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
-            {gameState?.playerOneHand?.map(c => FaceUpCard(c))}
+            {playerIsPlayerOne() ?
+              gameState?.playerOneHand?.map(c => FaceUpCard(c)) :
+              gameState?.playerTwoHand?.map(c => FaceUpCard(c))}
           </Row>
         </Container>
       </Card.Body>
