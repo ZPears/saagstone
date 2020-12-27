@@ -8,6 +8,8 @@ import * as FirebaseService from './../../services/FirebaseService';
 export default function PlayGameScreen() {
 
   const [gameState, setGameState] = useState<GameI>();
+  const [cursorX, setCursorX] = useState<number>(0);
+  const [cursorY, setCursorY] = useState<number>(0);
 
   const gameContext = useContext(GameContext);
 
@@ -19,9 +21,12 @@ export default function PlayGameScreen() {
     }
   }, [gameState, gameContext]);
 
-  function FaceUpCard(cardData: CardI) {
+  function FaceUpCard(cardData: CardI, cardIdx: number, rowNumber: number) {
+    const classes: string =
+      `face-up-card${cardIdx === cursorX && rowNumber === cursorY ?
+        " selected-input" : ""}`
     return (
-      <div className="face-up-card">
+      <div className={classes}>
         <p>Name: {cardData.cardName}</p>
         <p>Attack: {cardData.baseAttack}</p>
         <p>Health: {cardData.baseHealth}</p>
@@ -31,8 +36,11 @@ export default function PlayGameScreen() {
     )
   }
 
-  function FaceDownCard(cardData: CardI) {
-    return <div className="face-down-card"></div>
+  function FaceDownCard(cardData: CardI, cardIdx: number, rowNumber: number) {
+    const classes: string =
+      `face-down-card${cardIdx === cursorX && rowNumber === cursorY ?
+        " selected-input" : ""}`
+    return <div className={classes}></div>
   }
 
   function playerIsPlayerOne(): boolean | undefined {
@@ -56,23 +64,23 @@ export default function PlayGameScreen() {
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
             {playerIsPlayerOne() ?
-              gameState?.playerTwoHand?.map(c => FaceDownCard(c)) :
-              gameState?.playerOneHand?.map(c => FaceDownCard(c))}
+              gameState?.playerTwoHand?.map((c, i) => FaceDownCard(c, i, 3)) :
+              gameState?.playerOneHand?.map((c, i) => FaceDownCard(c, i, 3))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
             {playerIsPlayerOne() ?
-              gameState?.playerTwoBoard?.map(c => FaceUpCard(c)) :
-              gameState?.playerOneBoard?.map(c => FaceUpCard(c))}
+              gameState?.playerTwoBoard?.map((c, i) => FaceUpCard(c, i, 2)) :
+              gameState?.playerOneBoard?.map((c, i) => FaceUpCard(c, i, 2))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
             {playerIsPlayerOne() ?
-              gameState?.playerOneBoard?.map(c => FaceUpCard(c)) :
-              gameState?.playerTwoBoard?.map(c => FaceUpCard(c))}
+              gameState?.playerOneBoard?.map((c, i) => FaceUpCard(c, i, 1)) :
+              gameState?.playerTwoBoard?.map((c, i) => FaceUpCard(c, i, 1))}
           </Row>
           <Row xs={10} md={10} lg={10} className="gameboard-section">
             {playerIsPlayerOne() ?
-              gameState?.playerOneHand?.map(c => FaceUpCard(c)) :
-              gameState?.playerTwoHand?.map(c => FaceUpCard(c))}
+              gameState?.playerOneHand?.map((c, i) => FaceUpCard(c, i, 0)) :
+              gameState?.playerTwoHand?.map((c, i) => FaceUpCard(c, i, 0))}
           </Row>
         </Container>
       </Card.Body>
