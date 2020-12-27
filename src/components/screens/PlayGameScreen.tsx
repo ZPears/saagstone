@@ -3,6 +3,7 @@ import { Card, Col, Container, Row } from 'react-bootstrap';
 import { GameContext, GameScreen } from '../../contexts/GameContext';
 import GameI from "../../interfaces/GameI";
 import CardI from "../../interfaces/CardI";
+import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
 import * as FirebaseService from './../../services/FirebaseService';
 
 export default function PlayGameScreen() {
@@ -18,6 +19,25 @@ export default function PlayGameScreen() {
       gameContext.currentScreen === GameScreen.PLAYGAME) {
       FirebaseService.GetActiveGameRef(gameContext.gameId)
         .onSnapshot(doc => setGameState(doc.data() as GameI))
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (gameContext.currentScreen === GameScreen.PLAYGAME) {
+        switch (event.key) {
+          case keyNameForPicadeInput(PicadeInput.JOYSTICK_LEFT): {
+            setCursorX(Math.max(0, cursorX - 1));
+            break;
+          }
+          case keyNameForPicadeInput(PicadeInput.JOYSTICK_RIGHT): {
+            const maxRight: number | undefined = maxRightValue();
+            if (maxRight) { setCursorX(Math.min(maxRight - 1, cursorX + 1)) };
+            break;
+          }
+        }
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
     }
   }, [gameState, gameContext]);
 
@@ -45,6 +65,18 @@ export default function PlayGameScreen() {
 
   function playerIsPlayerOne(): boolean | undefined {
     return gameState?.playerOneAlias === gameContext.playerName;
+  }
+
+  function maxRightValue(): number | undefined {
+    // Player hand selected
+    if (cursorY === 0) {
+      return playerIsPlayerOne() ?
+        gameState?.playerOneHand?.length :
+        gameState?.playerTwoHand?.length;
+    } else {
+      // TODO: handle board selection
+      return undefined;
+    }
   }
 
   // TODO: Spell cards should have a target as part of their data structure.
