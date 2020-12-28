@@ -1,6 +1,7 @@
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/functions';
+import CardI from '../interfaces/CardI';
 import firebaseConfig from './config';
 
 firebase.initializeApp(firebaseConfig);
@@ -47,6 +48,15 @@ export async function JoinGame(gameId: string, playerAlias: string):
   Promise<FirebaseResponse<string>> {
   const fn = fns.httpsCallable("joinGame");
   return fn({ gameId, playerAlias })
+    .then(resp => resp.data as FirebaseResponse<string>)
+    .catch(err => err.data as FirebaseResponse<string>)
+}
+
+export async function PlayCardFromHand(gameId: string, isPlayerOne: boolean,
+  newBoard: CardI[], newHand: CardI[]):
+  Promise<FirebaseResponse<string>> {
+  const fn = fns.httpsCallable("playCardFromHand");
+  return fn({ gameId, isPlayerOne, newBoard, newHand })
     .then(resp => resp.data as FirebaseResponse<string>)
     .catch(err => err.data as FirebaseResponse<string>)
 }

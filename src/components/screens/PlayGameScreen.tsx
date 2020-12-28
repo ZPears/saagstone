@@ -63,7 +63,7 @@ export default function PlayGameScreen() {
 
   function PlayCardFromHand(cardIdx: number) {
     const isPlayerOne = playerIsPlayerOne();
-    if (gameState && gameState.playerOneHand && gameState.playerTwoHand) {
+    if (gameState && gameState.playerOneHand && gameState.playerTwoHand && isPlayerOne) {
       // TODO: Check board size.
       const maybeBoard = isPlayerOne ? gameState.playerOneBoard : gameState.playerTwoBoard;
       // TODO: Play cards somewhere based on user choice.
@@ -72,7 +72,7 @@ export default function PlayGameScreen() {
         [...gameState.playerOneHand] : [...gameState.playerTwoHand];
       newBoard.push(newHand[cardIdx]);
       newHand.splice(cardIdx, 1);
-      FirebaseService.playCardFromHand(isPlayerOne, newBoard, newHand);
+      FirebaseService.PlayCardFromHand(gameState.gameId, isPlayerOne, newBoard, newHand);
     } else {
       // TODO: Show some error about how the game state is invalid.
     }

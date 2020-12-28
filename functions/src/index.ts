@@ -172,3 +172,36 @@ export const joinGame = functions.https.onCall((data) => {
     }
   })
 })
+
+export const playCardFromHand = functions.https.onCall((data) => {
+  if (!data.gameId) {
+    return FirebaseFailure("No gameId provided.")
+  }
+  if (!data.isPlayerOne) {
+    return FirebaseFailure("No player number specified.");
+  }
+  if (!data.newBoard) {
+    return FirebaseFailure("No new board state provided.");
+  }
+  if (!data.newHand) {
+    return FirebaseFailure("No new hand state provided.");
+  }
+
+  const gameDocRef = db.collection("activeGames").doc(data.gameId);
+
+  return gameDocRef.get().then(doc => {
+    if (!doc.exists) {
+      return FirebaseFailure<string>(
+        `No game with ID ${data.gameId} exists!`
+      );
+    } else {
+      const handStr = data.isPlayerOne ? "playerOneHand" : "playerTwoHand";
+      const boardStr = data.isPlayerOne ? "playerOneBoard" : "playerTwoBoard";
+      return gameDocRef.update({
+        [handStr]: data.newHand,
+        [boardStr]: data.newBoard
+      }).then(_ => FirebaseSuccess<string>("OK"))
+        .catch(err => FirebaseFailure("PlayCard update failed."))
+    }
+  })
+})
