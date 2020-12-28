@@ -23,6 +23,40 @@ export default function PlayGameScreen() {
   const gameContext = useContext(GameContext);
 
   useEffect(() => {
+
+    function PlayCardFromHand(cardIdx: number) {
+      const isPlayerOne = playerIsPlayerOne();
+      if (gameState && gameState.playerOneHand && gameState.playerTwoHand && isPlayerOne) {
+        // TODO: Check board size.
+        const maybeBoard = isPlayerOne ? gameState.playerOneBoard : gameState.playerTwoBoard;
+        // TODO: Play cards somewhere based on user choice.
+        let newBoard: CardI[] = maybeBoard ? [...maybeBoard!] : [];
+        let newHand: CardI[] = isPlayerOne ?
+          [...gameState.playerOneHand] : [...gameState.playerTwoHand];
+        newBoard.push(newHand[cardIdx]);
+        newHand.splice(cardIdx, 1);
+        FirebaseService.PlayCardFromHand(gameState.gameId, isPlayerOne, newBoard, newHand);
+      } else {
+        // TODO: Show some error about how the game state is invalid.
+      }
+    }
+
+    function playerIsPlayerOne(): boolean | undefined {
+      return gameState?.playerOneAlias === gameContext.playerName;
+    }
+
+    function maxRightValue(): number | undefined {
+      // Player hand selected
+      if (cursorY === 0) {
+        return playerIsPlayerOne() ?
+          gameState?.playerOneHand?.length :
+          gameState?.playerTwoHand?.length;
+      } else {
+        // TODO: handle board selection
+        return undefined;
+      }
+    }
+
     if (gameContext.gameId &&
       gameContext.currentScreen === GameScreen.PLAYGAME) {
       FirebaseService.GetActiveGameRef(gameContext.gameId)
@@ -59,24 +93,7 @@ export default function PlayGameScreen() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [gameState, gameContext]);
-
-  function PlayCardFromHand(cardIdx: number) {
-    const isPlayerOne = playerIsPlayerOne();
-    if (gameState && gameState.playerOneHand && gameState.playerTwoHand && isPlayerOne) {
-      // TODO: Check board size.
-      const maybeBoard = isPlayerOne ? gameState.playerOneBoard : gameState.playerTwoBoard;
-      // TODO: Play cards somewhere based on user choice.
-      let newBoard: CardI[] = maybeBoard ? [...maybeBoard!] : [];
-      let newHand: CardI[] = isPlayerOne ?
-        [...gameState.playerOneHand] : [...gameState.playerTwoHand];
-      newBoard.push(newHand[cardIdx]);
-      newHand.splice(cardIdx, 1);
-      FirebaseService.PlayCardFromHand(gameState.gameId, isPlayerOne, newBoard, newHand);
-    } else {
-      // TODO: Show some error about how the game state is invalid.
-    }
-  }
+  }, [cursorX, cursorY, selectedCard, gameState, gameContext]);
 
   function FaceUpCard(cardData: CardI, cardIdx: number, rowNumber: number) {
     const classes: string =
@@ -102,18 +119,6 @@ export default function PlayGameScreen() {
 
   function playerIsPlayerOne(): boolean | undefined {
     return gameState?.playerOneAlias === gameContext.playerName;
-  }
-
-  function maxRightValue(): number | undefined {
-    // Player hand selected
-    if (cursorY === 0) {
-      return playerIsPlayerOne() ?
-        gameState?.playerOneHand?.length :
-        gameState?.playerTwoHand?.length;
-    } else {
-      // TODO: handle board selection
-      return undefined;
-    }
   }
 
   function GameboardSectionStyle(rowIdx: number): string {
