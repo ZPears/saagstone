@@ -29,3 +29,18 @@
   border: 1px solid;
   margin: 3px;
 }
+
+.card-highlighted {
+  border: 5px solid !important;
+  border-color: red !important;
+}
+
+.card-selected {
+  border: 5px solid !important;
+  border-color: darkgreen !important;
+}
+
+.section-selected {
+  border: 5px solid !important;
+  border-color: red !important;
+}

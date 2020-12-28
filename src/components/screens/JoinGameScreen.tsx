@@ -71,6 +71,10 @@ export default function JoinGameScreen() {
   }, [newGameHighlighted, newGameSelected, joinGameSelected, gameContext]);
 
   function handleFirebaseResponse(r: FirebaseService.FirebaseResponse<string>) {
+    if (!r) {
+      showErrorMessage("Firebase failed to respond.");
+      return;
+    }
     switch (r.status) {
       case FirebaseService.FirebaseServiceStatus.SUCCESS: {
         // TODO: Make a function to set all of these at once.

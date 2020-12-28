@@ -6,11 +6,19 @@ import CardI from "../../interfaces/CardI";
 import { keyNameForPicadeInput, PicadeInput } from '../../picade/PicadeInputs';
 import * as FirebaseService from './../../services/FirebaseService';
 
+interface SelectedCard {
+  xIdx: number,
+  yIdx: number, // 0 is hand, 1 is board
+}
+
 export default function PlayGameScreen() {
 
   const [gameState, setGameState] = useState<GameI>();
   const [cursorX, setCursorX] = useState<number>(0);
   const [cursorY, setCursorY] = useState<number>(0);
+
+  const [selectedCard, setSelectedCard] =
+    useState<SelectedCard | undefined>(undefined);
 
   const gameContext = useContext(GameContext);
 
@@ -32,6 +40,18 @@ export default function PlayGameScreen() {
             if (maxRight) { setCursorX(Math.min(maxRight - 1, cursorX + 1)) };
             break;
           }
+          case keyNameForPicadeInput(PicadeInput.BUTTON_A): {
+            if (!selectedCard) {
+              setSelectedCard({ xIdx: cursorX, yIdx: cursorY })
+              if (cursorY === 0) {
+                setCursorY(1);
+              }
+            } else {
+              if (cursorY === 1 && selectedCard.yIdx === 0) {
+                PlayCardFromHand(selectedCard.xIdx);
+              }
+            }
+          }
         }
       }
     }
@@ -41,10 +61,27 @@ export default function PlayGameScreen() {
     }
   }, [gameState, gameContext]);
 
+  function PlayCardFromHand(cardIdx: number) {
+    const isPlayerOne = playerIsPlayerOne();
+    if (gameState && gameState.playerOneHand && gameState.playerTwoHand) {
+      // TODO: Check board size.
+      const maybeBoard = isPlayerOne ? gameState.playerOneBoard : gameState.playerTwoBoard;
+      // TODO: Play cards somewhere based on user choice.
+      let newBoard: CardI[] = maybeBoard ? [...maybeBoard!] : [];
+      let newHand: CardI[] = isPlayerOne ?
+        [...gameState.playerOneHand] : [...gameState.playerTwoHand];
+      newBoard.push(newHand[cardIdx]);
+      newHand.splice(cardIdx, 1);
+      FirebaseService.playCardFromHand(isPlayerOne, newBoard, newHand);
+    } else {
+      // TODO: Show some error about how the game state is invalid.
+    }
+  }
+
   function FaceUpCard(cardData: CardI, cardIdx: number, rowNumber: number) {
     const classes: string =
       `face-up-card${cardIdx === cursorX && rowNumber === cursorY ?
-        " selected-input" : ""}`
+        " card-highlighted" : ""}`
     return (
       <div className={classes}>
         <p>Name: {cardData.cardName}</p>
@@ -59,7 +96,7 @@ export default function PlayGameScreen() {
   function FaceDownCard(cardData: CardI, cardIdx: number, rowNumber: number) {
     const classes: string =
       `face-down-card${cardIdx === cursorX && rowNumber === cursorY ?
-        " selected-input" : ""}`
+        " card-highlighted" : ""}`
     return <div className={classes}></div>
   }
 
@@ -79,6 +116,10 @@ export default function PlayGameScreen() {
     }
   }
 
+  function GameboardSectionStyle(rowIdx: number): string {
+    return `gameboard-section${cursorY === rowIdx ? " section-selected" : ""}`
+  }
+
   // TODO: Spell cards should have a target as part of their data structure.
   //       That way they can start off targeting the right part of the board.
   return (
@@ -94,22 +135,22 @@ export default function PlayGameScreen() {
               <b>Mana:</b> {gameState?.playerTwoMana}{"  "}
               <b>Deck Size:</b>{gameState?.playerTwoDeck?.length}</Col>
           </Row>
-          <Row xs={10} md={10} lg={10} className="gameboard-section">
+          <Row xs={10} md={10} lg={10} className={GameboardSectionStyle(3)}>
             {playerIsPlayerOne() ?
               gameState?.playerTwoHand?.map((c, i) => FaceDownCard(c, i, 3)) :
               gameState?.playerOneHand?.map((c, i) => FaceDownCard(c, i, 3))}
           </Row>
-          <Row xs={10} md={10} lg={10} className="gameboard-section">
+          <Row xs={10} md={10} lg={10} className={GameboardSectionStyle(2)}>
             {playerIsPlayerOne() ?
               gameState?.playerTwoBoard?.map((c, i) => FaceUpCard(c, i, 2)) :
               gameState?.playerOneBoard?.map((c, i) => FaceUpCard(c, i, 2))}
           </Row>
-          <Row xs={10} md={10} lg={10} className="gameboard-section">
+          <Row xs={10} md={10} lg={10} className={GameboardSectionStyle(1)}>
             {playerIsPlayerOne() ?
               gameState?.playerOneBoard?.map((c, i) => FaceUpCard(c, i, 1)) :
               gameState?.playerTwoBoard?.map((c, i) => FaceUpCard(c, i, 1))}
           </Row>
-          <Row xs={10} md={10} lg={10} className="gameboard-section">
+          <Row xs={10} md={10} lg={10} className={GameboardSectionStyle(0)}>
             {playerIsPlayerOne() ?
               gameState?.playerOneHand?.map((c, i) => FaceUpCard(c, i, 0)) :
               gameState?.playerTwoHand?.map((c, i) => FaceUpCard(c, i, 0))}
